@@ -1,0 +1,18 @@
+{
+  "name": "game-tree-solver",
+  "version": "1.0.0",
+  "description": "Extended Form Game Solver",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
