@@ -38,7 +38,7 @@ class GameTreeApp {
         const namesInput = document.getElementById('player-names');
         const defaultNames = Array(this.gameTree.playerCount)
             .fill()
-            .map((_, i) => `Player ${i + 1}`)
+            .map((_, i) => `Гравець ${i + 1}`)
             .join(', ');
         
         namesInput.value = this.gameTree.playerNames.join(', ') || defaultNames;
@@ -48,7 +48,7 @@ class GameTreeApp {
     setupEventListeners() {
         document.getElementById('add-player-node').addEventListener('click', () => {
             if (!this.renderer.selectedNode && this.gameTree.nodes.length > 0) {
-                alert('Please select a node to add a player node to');
+                alert('Будь ласка, оберіть вузол для додавання вузла гравця');
                 return;
             }
             
@@ -72,12 +72,12 @@ class GameTreeApp {
         
         document.getElementById('add-terminal-node').addEventListener('click', () => {
             if (!this.renderer.selectedNode) {
-                alert('Please select a node to add a terminal node to');
+                alert('Будь ласка, оберіть вузол для додавання термінального вузла');
                 return;
             }
             
             const node = this.gameTree.addNode('terminal', this.renderer.selectedNode.id, 
-                `Action ${this.renderer.selectedNode.children.length + 1}`);
+                `Дія ${this.renderer.selectedNode.children.length + 1}`);
             
             // Add animation class
             node._animate = true;
@@ -96,7 +96,7 @@ class GameTreeApp {
         });
         
         document.getElementById('clear-all').addEventListener('click', () => {
-            if (confirm('Are you sure you want to clear the entire game tree?')) {
+            if (confirm('Ви впевнені, що хочете очистити все дерево гри?')) {
                 this.gameTree = new GameTree();
                 this.renderer.gameTree = this.gameTree;
                 this.renderer.selectedNode = null;
@@ -116,38 +116,38 @@ class GameTreeApp {
     }
 
     showNodePropertiesForm(node) {
-    const formContainer = document.getElementById('node-properties-form');
-    formContainer.innerHTML = '';
-    
-    const idField = document.createElement('div');
-    idField.innerHTML = `<strong>Node ID:</strong> ${node.id}`;
-    formContainer.appendChild(idField);
-    
-    // Добавляем управление размером узла
-    const sizeField = document.createElement('div');
-    sizeField.innerHTML = `
-        <label for="node-size">Node Size:</label>
-        <input type="range" id="node-size" min="20" max="50" value="${node.radius || this.renderer.nodeRadius}">
-        <span id="node-size-value">${node.radius || this.renderer.nodeRadius}</span>
-    `;
-    formContainer.appendChild(sizeField);
-    
-    // Обновляем значение при изменении ползунка
-    document.getElementById('node-size').addEventListener('input', (e) => {
-        document.getElementById('node-size-value').textContent = e.target.value;
-    });
-    
-    const actionField = document.createElement('div');
-    actionField.innerHTML = `
-        <label for="node-action">Action Label:</label>
-        <input type="text" id="node-action" value="${node.action || ''}">
-    `;
-    formContainer.appendChild(actionField);
+        const formContainer = document.getElementById('node-properties-form');
+        formContainer.innerHTML = '';
         
+        const idField = document.createElement('div');
+        idField.innerHTML = `<strong>ID вузла:</strong> ${node.id}`;
+        formContainer.appendChild(idField);
+        
+        // Додаємо управління розміром вузла
+        const sizeField = document.createElement('div');
+        sizeField.innerHTML = `
+            <label for="node-size">Розмір вузла:</label>
+            <input type="range" id="node-size" min="20" max="50" value="${node.radius || this.renderer.nodeRadius}">
+            <span id="node-size-value">${node.radius || this.renderer.nodeRadius}</span>
+        `;
+        formContainer.appendChild(sizeField);
+        
+        // Оновлюємо значення при зміні повзунка
+        document.getElementById('node-size').addEventListener('input', (e) => {
+            document.getElementById('node-size-value').textContent = e.target.value;
+        });
+        
+        const actionField = document.createElement('div');
+        actionField.innerHTML = `
+            <label for="node-action">Назва дії:</label>
+            <input type="text" id="node-action" value="${node.action || ''}">
+        `;
+        formContainer.appendChild(actionField);
+            
         if (node.type === 'player') {
             const playerSelect = document.createElement('div');
             playerSelect.innerHTML = `
-                <label for="node-player">Player:</label>
+                <label for="node-player">Гравець:</label>
                 <select id="node-player">
                     ${this.gameTree.playerNames.map((name, i) => 
                         `<option value="${i}" ${node.player === i ? 'selected' : ''}>${name}</option>`
@@ -158,17 +158,17 @@ class GameTreeApp {
             
             const strategyField = document.createElement('div');
             strategyField.innerHTML = `
-                <label for="node-strategy">Strategy Name:</label>
+                <label for="node-strategy">Назва стратегії:</label>
                 <input type="text" id="node-strategy" value="${node.strategy || ''}">
             `;
             formContainer.appendChild(strategyField);
         } else if (node.type === 'terminal') {
             const payoffsField = document.createElement('div');
             payoffsField.innerHTML = `
-                <label>Payoffs:</label>
+                <label>Виграші:</label>
                 ${node.payoffs.map((payoff, i) => `
                     <div class="payoff-input">
-                        <label>${this.gameTree.playerNames[i] || `Player ${i + 1}`}:</label>
+                        <label>${this.gameTree.playerNames[i] || `Гравець ${i + 1}`}:</label>
                         <input type="number" class="payoff-value" data-player="${i}" value="${payoff}" step="0.1">
                     </div>
                 `).join('')}
@@ -177,15 +177,15 @@ class GameTreeApp {
         }
         
         const saveButton = document.createElement('button');
-        saveButton.textContent = 'Save Changes';
+        saveButton.textContent = 'Зберегти зміни';
         saveButton.addEventListener('click', () => this.saveNodeProperties(node));
         formContainer.appendChild(saveButton);
         
         const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete Node';
+        deleteButton.textContent = 'Видалити вузол';
         deleteButton.classList.add('delete-button');
         deleteButton.addEventListener('click', () => {
-            if (confirm('Delete this node and all its descendants?')) {
+            if (confirm('Видалити цей вузол і всі його дочірні вузли?')) {
                 this.gameTree.deleteNode(node.id);
                 this.renderer.selectedNode = null;
                 this.renderer.render();
@@ -197,7 +197,7 @@ class GameTreeApp {
 
     hideNodePropertiesForm() {
         const formContainer = document.getElementById('node-properties-form');
-        formContainer.innerHTML = '<p>Select a node to edit its properties</p>';
+        formContainer.innerHTML = '<p>Оберіть вузол для редагування</p>';
     }
 
     saveNodeProperties(node) {
@@ -251,33 +251,49 @@ class GameTreeApp {
         stepsContent.innerHTML = '';
         
         if (!solution) {
-            solutionContent.innerHTML = '<p>No solution found.</p>';
+            solutionContent.innerHTML = '<p>Розв\'язок не знайдено.</p>';
             return;
+        }
+        
+        if (solution.multipleSolutions) {
+            const warning = document.createElement('div');
+            warning.className = 'solution-warning';
+            warning.innerHTML = `
+                <h4>Увага: Гра має декілька SPNE розв'язків!</h4>
+                <p>Це означає, що є декілька оптимальних стратегій, які дають однакові виграші.</p>
+                <p>Показано один з можливих розв'язків.</p>
+            `;
+            solutionContent.appendChild(warning);
         }
         
         const payoffsSection = document.createElement('div');
         payoffsSection.innerHTML = `
-            <h4>Expected Payoffs:</h4>
+            <h4>Очікувані виграші:</h4>
             <ul>
                 ${solution.expectedPayoffs.map((payoff, i) => `
-                    <li>${this.gameTree.playerNames[i] || `Player ${i + 1}`}: ${payoff.toFixed(2)}</li>
+                    <li>${this.gameTree.playerNames[i] || `Гравець ${i + 1}`}: ${payoff.toFixed(2)}</li>
                 `).join('')}
             </ul>
         `;
         solutionContent.appendChild(payoffsSection);
         
         const strategiesSection = document.createElement('div');
-        strategiesSection.innerHTML = '<h4>Optimal Strategies:</h4>';
+        strategiesSection.innerHTML = '<h4>Оптимальні стратегії:</h4>';
         
         const strategiesList = document.createElement('ul');
         for (const [nodeId, strategy] of Object.entries(solution.strategies)) {
             const node = this.gameTree.getNode(parseInt(nodeId));
             if (node) {
-                const playerName = this.gameTree.playerNames[node.player] || `Player ${node.player + 1}`;
+                const playerName = this.gameTree.playerNames[node.player] || `Гравець ${node.player + 1}`;
                 const item = document.createElement('li');
-                item.innerHTML = `
-                    <strong>${playerName} at Node ${nodeId}:</strong> ${strategy}
-                `;
+                
+                let strategyText = `<strong>${playerName} у вузлі ${nodeId}:</strong> ${strategy}`;
+                
+                if (solution.alternativeStrategies && solution.alternativeStrategies[nodeId]) {
+                    strategyText += `<br><em>Альтернативні оптимальні дії: ${solution.alternativeStrategies[nodeId].join(', ')}</em>`;
+                }
+                
+                item.innerHTML = strategyText;
                 strategiesList.appendChild(item);
             }
         }
@@ -287,7 +303,7 @@ class GameTreeApp {
         
         if (solution.steps && solution.steps.length > 0) {
             const stepsSection = document.createElement('div');
-            stepsSection.innerHTML = '<h4>Solution Steps (Backward Induction):</h4>';
+            stepsSection.innerHTML = '<h4>Кроки розв\'язку (зворотна індукція):</h4>';
             
             const stepsList = document.createElement('ol');
             solution.steps.forEach(step => {
@@ -296,13 +312,13 @@ class GameTreeApp {
                 
                 if (step.payoffs) {
                     const payoffsText = step.payoffs.map((p, i) => 
-                        `${this.gameTree.playerNames[i] || `Player ${i + 1}`}: ${p.toFixed(2)}`
+                        `${this.gameTree.playerNames[i] || `Гравець ${i + 1}`}: ${p.toFixed(2)}`
                     ).join(', ');
-                    stepItem.innerHTML += `<br>Payoffs: [${payoffsText}]`;
+                    stepItem.innerHTML += `<br>Виграші: [${payoffsText}]`;
                 }
                 
                 if (step.alternativeActions) {
-                    stepItem.innerHTML += `<br>Note: Other equally good actions: ${step.alternativeActions.join(', ')}`;
+                    stepItem.innerHTML += `<br>Примітка: Інші рівноцінні дії: ${step.alternativeActions.join(', ')}`;
                 }
                 
                 stepsList.appendChild(stepItem);

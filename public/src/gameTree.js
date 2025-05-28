@@ -5,7 +5,7 @@ export class GameTree {
         this.edges = [];
         this.nextNodeId = 1;
         this.playerCount = 2;
-        this.playerNames = ['Player 1', 'Player 2'];
+        this.playerNames = ['Гравець 1', 'Гравець 2'];
         this.solutionSteps = [];
     }
 
@@ -26,7 +26,7 @@ export class GameTree {
             const parent = this.getNode(parentId);
             if (parent) {
                 parent.children.push(id);
-                this.edges.push({ from: parentId, to: id, action: action || `Action ${parent.children.length}` });
+                this.edges.push({ from: parentId, to: id, action: action || `Дія ${parent.children.length}` });
             }
         } else if (this.root === null) {
             this.root = id;
@@ -91,8 +91,10 @@ export class GameTree {
 
         const solution = {
             strategies: {},
+            alternativeStrategies: {}, // Для зберігання альтернативних оптимальних дій
             expectedPayoffs: Array(this.playerCount).fill(0),
-            steps: []
+            steps: [],
+            multipleSolutions: false // Прапорець для декількох розв'язків
         };
 
         const solveRecursive = (nodeId, path = []) => {
@@ -101,7 +103,7 @@ export class GameTree {
             
             if (node.type === 'terminal') {
                 this.solutionSteps.push({
-                    description: `Terminal node ${nodeId} reached with payoffs: [${node.payoffs.join(', ')}]`,
+                    description: `Досягнуто термінальний вузол ${nodeId} з виграшами: [${node.payoffs.join(', ')}]`,
                     path: [...currentPath],
                     payoffs: node.payoffs
                 });
@@ -124,6 +126,7 @@ export class GameTree {
                 let bestPayoff = -Infinity;
                 let bestChildIndex = 0;
                 let bestActions = [];
+                let alternativeActions = [];
                 
                 for (let i = 0; i < childResults.length; i++) {
                     if (childResults[i].payoffs[currentPlayer] > bestPayoff) {
@@ -135,21 +138,35 @@ export class GameTree {
                     }
                 }
                 
+                // Якщо є декілька оптимальних дій
+                if (bestActions.length > 1) {
+                    solution.multipleSolutions = true;
+                    alternativeActions = bestActions.filter(i => i !== bestChildIndex);
+                }
+                
                 const bestChildId = node.children[bestChildIndex];
                 const bestChild = this.getNode(bestChildId);
-                const actionName = bestChild.action || `Action ${bestChildIndex + 1}`;
+                const actionName = bestChild.action || `Дія ${bestChildIndex + 1}`;
                 solution.strategies[nodeId] = actionName;
                 
+                // Зберігаємо альтернативні дії, якщо вони є
+                if (alternativeActions.length > 0) {
+                    solution.alternativeStrategies[nodeId] = alternativeActions.map(i => {
+                        const child = this.getNode(node.children[i]);
+                        return child.action || `Дія ${i + 1}`;
+                    });
+                }
+                
                 this.solutionSteps.push({
-                    description: `Player ${this.playerNames[currentPlayer]} chooses ${actionName} at node ${nodeId}`,
+                    description: `${this.playerNames[currentPlayer]} обирає ${actionName} у вузлі ${nodeId}`,
                     path: [...currentPath],
                     payoffs: childResults[bestChildIndex].payoffs,
                     player: currentPlayer,
                     chosenAction: actionName,
-                    alternativeActions: bestActions.length > 1 ? 
-                        bestActions.map(i => {
+                    alternativeActions: alternativeActions.length > 0 ? 
+                        alternativeActions.map(i => {
                             const child = this.getNode(node.children[i]);
-                            return child.action || `Action ${i + 1}`;
+                            return child.action || `Дія ${i + 1}`;
                         }) : null
                 });
                 
@@ -182,7 +199,7 @@ export class GameTree {
         this.nodes = data.nodes;
         this.edges = data.edges;
         this.playerCount = data.playerCount;
-        this.playerNames = data.playerNames || Array(this.playerCount).map((_, i) => `Player ${i + 1}`);
+        this.playerNames = data.playerNames || Array(this.playerCount).map((_, i) => `Гравець ${i + 1}`);
         this.nextNodeId = Math.max(...this.nodes.map(n => n.id), 0) + 1;
     }
 }
